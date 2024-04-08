@@ -1,0 +1,207 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "toc_visible": true,
+      "authorship_tag": "ABX9TyMgcjho2J/UeO+QKkWvVR36",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/alibabastocks/a-b-tests-t-test-2-variants/blob/main/test\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Sample Size Calculator\n",
+        "\n",
+        "*   Binary distribution\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "9zJYqrhxyV5q"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Approaches explanation:\n",
+        "\n",
+        "*   Power: This represents the probability of correctly rejecting a false null hypothesis. It's often calculated as one minus beta (β), which is the probability of making a Type II error (failing to detect a real difference). A higher power indicates a greater chance of identifying a true effect if it's present in your data.\n",
+        "\n",
+        "*   Alpha: This represents the probability of rejecting a true null hypothesis. It's often referred to as the significance level. It essentially indicates the risk of getting a false positive result (concluding a difference exists when there truly isn't). Common choices for alpha are 0.05 (5%) or 0.01 (1%).\n",
+        "\n",
+        "*   Two-tailed test (default approach): It assumes the new variation (B) could be either better or worse than the control (A) on the metric you're testing. It essentially checks for any statistically significant difference between A and B.\n",
+        "\n",
+        "*   One-tailed test (less common): This is used when you have a strong prior belief that the variation will be better (or worse) than the control. For instance, you might have seen positive results from similar tests in the past.  Here, the test focuses on detecting a difference only in the direction you predicted (e.g., B having a higher conversion rate than A). This approach requires a smaller sample size.\n"
+      ],
+      "metadata": {
+        "id": "VWFbsSzfQXWQ"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Import libraries\n",
+        "import numpy as np\n",
+        "import statsmodels.api as sm\n",
+        "import statsmodels.stats.power"
+      ],
+      "metadata": {
+        "id": "7wgNBM3wm9ea"
+      },
+      "execution_count": 126,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Edit the following fieds with your experiment data.\n",
+        "# Enter numbers as decimals, eg 50% becomes 0.5\n",
+        "\n",
+        "cr=(0.063)  # Baseline, this the the conversion rate in your control group\n",
+        "\n",
+        "uplift= (0.10, 0.15, 0.20) # The level of improvement of the conversion rate you would like to achieve, max to min.\n",
+        "                            # You can also just add one as in cr_new = (0.10)\n",
+        "\n",
+        "traffic_control = 0.5  # % of traffic you plan to send to the control (A)\n",
+        "\n",
+        "traffic_variation = 0.5 # % of traffic you plan to send to the new variation (B)\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "BZFBGeY_O0yl"
+      },
+      "execution_count": 127,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Edit the following fields with the level of risk you are willing to accept for this test\n",
+        "# Desired power (probability of detecting an effect)\n",
+        "power = 0.8\n",
+        "\n",
+        "# Significance level (alpha)\n",
+        "alpha = 0.05\n",
+        "\n",
+        "# Decide whether your test is two or one-sided\n",
+        "alternative = \"two-sided\" # Keep as \"two-sided\" if you are good with the default\n",
+        "                          # Otherwise set the alternative hypothesis for one-sided test (\"larger\" mean in new variation B, \"smaller\" means in control group A).\n"
+      ],
+      "metadata": {
+        "id": "b_7jHLUNROem"
+      },
+      "execution_count": 128,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Traffic ratio\n",
+        "traffic_ratio = traffic_control/traffic_variation\n",
+        "\n",
+        "new_cr = []\n",
+        "\n",
+        "#Calculate new cr\n",
+        "for item in uplift :\n",
+        "            new_cr.append((cr + (cr*item)))\n",
+        "\n",
+        "print ( new_cr)\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "zjQYmCJ2QIU0",
+        "outputId": "a691fd46-9c1a-4ee8-9892-045a898aa7b8"
+      },
+      "execution_count": 133,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[0.0693, 0.07245, 0.0756]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "effect_size_std = sm.stats.proportion_effectsize(cr_new, cr)\n",
+        "\n",
+        "print (effect_size_std)"
+      ],
+      "metadata": {
+        "id": "wu5NMbD8q7v1",
+        "outputId": "aadd22dd-fc1d-4230-eb2a-eeb0b54bc4bc",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 130,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[0.13607885 0.28797657 0.41987296]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "sample_sizes = []\n",
+        "\n",
+        "for effect in effect_size_std:\n",
+        "  sample_size = statsmodels.stats.power.TTestIndPower().solve_power(effect_size=effect, power=power, alpha=alpha, nobs1=None, ratio=traffic_ratio, alternative=alternative\n",
+        "  )\n",
+        "  sample_sizes.append(sample_size)\n",
+        "\n",
+        "print(sample_sizes)"
+      ],
+      "metadata": {
+        "id": "y8tNnIxV2dOU",
+        "outputId": "78078c6f-4ad8-4983-f3d8-a87b34deda24",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 134,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[848.6871701882478, 190.2528028559887, 90.01371375505462]\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
