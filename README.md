@@ -4,4 +4,5 @@ It uses t-test to assess the winning variant
 
 
 # Sample size cal
-For binary variables only
+The repo is for binary variables only. You can alt. you this sheet: https://airahome-my.sharepoint.com/:x:/p/jeffrey_chen/EVjv5Sg-8xpPil1ufg6BO1wB8knVthJUUW9kJEK3FAjQKg?e=r0AnGF
+
